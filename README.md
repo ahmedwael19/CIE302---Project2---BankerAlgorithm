@@ -5,6 +5,17 @@ Implementing  Multithreaded Banker Algorithm - Programming project for chapter 7
 This code is fully developed by Ahmed Wael and my colleague Mohamed Elsayed for the operating system class in spring 2018.
 
 
+## Makefile:
+The code can be compiled to produce output and cleaned to remove the output using make
+
+```
+$ make
+gcc -pthread main.c -o main
+$ ./main 2 3 4
+$ make clean
+rm -f main
+```
+
 ## Error handling:
 Code is capable of handling the input error cases.
 
