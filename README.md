@@ -168,12 +168,11 @@ Reached the end of the program!
 
 * [GCC](https://gcc.gnu.org/) - The GNU Compiler Collection
 * [Ubuntu 16.04 LTS](releases.ubuntu.com/16.04/) - Xenial Xerus
-## Contributing
 
 ## Authors
 
-* **Mohamed Elsayed** - ** - [Github](https://github.com/mohamedelsayed95)
-* **Ahmed Wael** - ** - [Github](https://github.com/ahmedwael19)
+* **Mohamed Elsayed** - [Github](https://github.com/mohamedelsayed95)
+* **Ahmed Wael** - [Github](https://github.com/ahmedwael19)
 
 ## License
 
