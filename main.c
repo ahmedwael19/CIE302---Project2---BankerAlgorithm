@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include "banker.h"
+#include <stdbool.h>
 
 /* these may be any values >= 0 */
 #define NUMBER_OF_CUSTOMERS 5
@@ -37,39 +38,29 @@ int main(int argc, char *argv[])
 
 
     /*setting up the available vector */
-    printf("Avaiable \n");
     for(int i=0; i<NUMBER_OF_RESOURCES; i++)
     {
         available[i] = atoi(argv[i+1]);
-        printf("%d  ",available[i]);
+        printf("%d ",available[i]);
+
+        for(int j=0; j<NUMBER_OF_RESOURCES; j++)
+        {
+            maximum[j][i] = 10;    /* random initializations for maximum allowed requests*/
+            need[j][i] = 10;  /*The need should equal the maximum*/
+            allocation[j][i]=0;    /*By default the allocation matrix is zero*/
+        }
     }
 
-    /* random initializations for maximum allowed requests*/
-    for(int i=0; i<NUMBER_OF_CUSTOMERS; i++)
-    {
-        for(int j=0; j<NUMBER_OF_RESOURCES; j++)
-        {
-            maximum[i][j] = 3;
-        }
-    }
-    for(int i=0; i<NUMBER_OF_CUSTOMERS; i++)
-    {
-        for(int j=0; j<NUMBER_OF_RESOURCES; j++)
-        {
-            need[i][j] = 3;
-        }
-    }
 
     pthread_t tid[NUMBER_OF_CUSTOMERS]; /* the thread identifiers */
 
     /* create the thread */
     for(int i=0; i<NUMBER_OF_CUSTOMERS; i++)
-    {
-        pthread_create(&(tid[i]),NULL,getResources,&i); //problem is herer//
-    }
+        pthread_create(&(tid[i]),NULL,getResources,&i);
+
     /* now wait for the thread to exit */
     for(int i=0; i<NUMBER_OF_CUSTOMERS; i++)
-        pthread_join(tid[i],NULL);
+        pthread_join(tid[i],0);
 
     pthread_mutex_destroy(&lock);
     return 0;
@@ -78,39 +69,28 @@ int main(int argc, char *argv[])
 
 void* getResources(void *arg)
 {
-	
-    int finished = 1;
-    int customer_num = *(int *)arg;
 
-    for(int i=0; i<NUMBER_OF_RESOURCES; i++)
+    bool released = false;
+    int customer_num = *(int *)arg;  //typecasting
+    int request_one[] = {6,7,8};     //prototype for a request
+
+
+    //CRITICAL SECTION //
+    pthread_mutex_lock(&lock);
+    released=request_resources(request_one,customer_num);
+    pthread_mutex_unlock(&lock);
+    if(released==true)
     {
-        if(need[customer_num][i] != 0)
-	{
-            finished=0;
-    	}
-     }
-    /* request some resoureces */
-    /* simulate a process that divides its need on multiple requests */
-    /* overall requests = {3,3,3} */
-    int request_one[] = {1,1,2};
-    int request_two[] = {1,2,1};
-    int request_three[] = {2,1,1};
-
-
-    while(!finished)
-    {
-        request_resources(request_one, customer_num);
-        request_resources(request_two, customer_num);
-        request_resources(request_three, customer_num);
+        pthread_mutex_lock(&lock);
+        release_resources(request_one,customer_num);
+        pthread_mutex_unlock(&lock);
+        released=false;
     }
-    /* thread code should be run here */
-    printf("Process has granted all required resources ..");
 
-    /* if granted then release the finished threads */
-    if(!release_resources(allocation[customer_num],customer_num))
-        printf("Releasing resources for process %d was not successful",customer_num);
 
-    printf("Process %d has finished execution",customer_num);
+    //int request_two[] = {1,2,1};
+    //int request_three[] = {2,1,1};
 
-    return NULL;
+
+    return 0;
 }
