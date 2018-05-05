@@ -1,8 +1,10 @@
 # CIE302 - BankerAlgorithm
 
-Implementing  Multithreaded Banker Algorithm - Programming project for chapter 7, Operating Systems Concepts textbook.
+Multithreaded program that implements the banker’s algorithm - Programming project for chapter 7, Operating Systems Concepts textbook.
 
-This code is fully developed by Ahmed Wael and my colleague Mohamed Elsayed for the operating system class in spring 2018.
+Several customers request and release resources from the bank. The banker will grant a request only if it leaves the system in a safe state. A request that leaves the system in an unsafe state will be denied. This project combines three separate topics: (1) multithreading (2) preventing race conditions (3) deadlock avoidance
+
+This code is fully developed by Ahmed Wael and Mohamed Elsayed for the operating system class in spring 2018.
 
 
 ## Makefile:
