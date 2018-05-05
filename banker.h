@@ -5,6 +5,20 @@
 #define NUMBER_OF_RESOURCES 3
 #include <stdbool.h>
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+
+
+/* these may be any values >= 0 */
+#define NUMBER_OF_CUSTOMERS 5
+#define NUMBER_OF_RESOURCES 3
+/* the available amount of each resource */
 extern int available[NUMBER_OF_RESOURCES];
 /*the maximum demand of each customer */
 extern int maximum[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES];
@@ -12,95 +26,11 @@ extern int maximum[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES];
 extern int allocation[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES];
 /* the remaining need of each customer */
 extern int need[NUMBER_OF_CUSTOMERS][NUMBER_OF_RESOURCES];
+
 /* mutex lock */
+//pthread_mutex_t lock;
 pthread_mutex_t lock;
 
-/*functions prototypes */
-bool request_resources(int [], int);
-bool release_resources(int [], int);
-bool isSafe();
-
-
-bool release_resources(int release[],int customer_num)
-{
-    /*add resouces*/
-    for(int i=0; i<  NUMBER_OF_RESOURCES; i++)
-    {
-        printf("%d\n ",release[i]);
-        available[i] += release[i];
-        need[customer_num][i] +=release[i];
-        allocation[customer_num][i] -= release[i];
-
-    }
-    return true;
-}
-
-bool request_resources(int request[], int customer_num)
-{
-    printf("\nCustomer %d is Requesting Resources :\n",customer_num);
-    for(int i=0; i<NUMBER_OF_RESOURCES; i++)
-    {
-        printf("%d ", request[i]);
-    }
-
-    printf("\nAvailable Resources : \n");
-
-    for(int i = 0; i < NUMBER_OF_RESOURCES; i++)
-    {
-        printf("%d ",available[i]);
-    }
-
-    printf("\nThe need : \n");
-    for(int i = 0; i < NUMBER_OF_RESOURCES; i++)
-    {
-        printf("%d ",need[customer_num][i]);
-    }
-    printf("\n");
-    for(int i=0; i<NUMBER_OF_RESOURCES; i++)
-    {
-        if(request[i] <= need[customer_num][i]) // if the need is more than the request, abort before checking anything else.
-        {
-            if(request[i]>available[i])
-            {
-                printf("NOT SAFE with this request. request > available \n");
-                sleep(1);
-                return false;
-            }
-            else  //taking resources//
-            {
-                for(int i=0; i<NUMBER_OF_RESOURCES; i++)
-                {
-                    available[i] -= request[i];
-                    allocation[customer_num][i] += request[i];
-                    need[customer_num][i] -= request[i];
-                }
-                if(isSafe())
-                {
-                    printf("The System is Safe \n Resources Granted \n");
-                    return true;
-                }
-                else
-                {
-                    printf("NOT SAFE ! CAN'T GRANT RESOURCES \n");
-                    for(int i = 0; i < NUMBER_OF_RESOURCES; i++)   //Adding resources
-                    {
-                        available[i] += request[i];
-                        need[customer_num][i] +=request[i];
-                        allocation[customer_num][i] -= request[i];
-                    }
-                    return false;
-                }
-            }
-        }
-
-        else if(request[i] > need[customer_num][i])
-        {
-            printf("The request is more than the need ! Abort \n");
-            return false;
-        }
-    }
-    return true;
-}
 
 
 bool isSafe()
@@ -115,7 +45,7 @@ bool isSafe()
     int count = 0;
     int customer_count = 1;
     bool flag = true;
-    printf("COUNT : %d \n ",count);
+    //printf("COUNT : %d \n ",count);
     for(int i=0; i<NUMBER_OF_RESOURCES; i++)
         work[i] = available[i];
 
@@ -134,7 +64,7 @@ bool isSafe()
 
     while(count<NUMBER_OF_CUSTOMERS)
     {
-        printf("COUNT : %d \n ",count);
+        //printf("COUNT : %d \n ",count);
         if(finish[customer_count] == false)
         {
             /* check if the process can be granted the resources */
@@ -153,6 +83,7 @@ bool isSafe()
                 customer_count = (customer_count + 1) % NUMBER_OF_CUSTOMERS; //not sure :/
                 break;
             }
+printf("STUCK HERE\n");
 
         }
 
@@ -173,6 +104,104 @@ bool isSafe()
     }
 
     return true;
+}
+
+
+bool release_resources(int release[],int customer_num)
+{
+    /*add resouces*/
+    for(int i=0; i<  NUMBER_OF_RESOURCES; i++)
+    {
+        //printf("%d\n ",release[i]);
+        available[i] += release[i];
+    }
+    return true;
+}
+
+bool request_resources(int request[], int customer_num)
+{
+
+//    sleep(1);
+    printf("\nCustomer %d is Requesting Resources:\n",customer_num);
+    for(int i=0; i<NUMBER_OF_RESOURCES; i++)
+    {
+        printf("%d ", request[i]);
+    }
+
+    printf("\nAvailable Resources : \n");
+
+    for(int i = 0; i < NUMBER_OF_RESOURCES; i++)
+    {
+        printf("%d ",available[i]);
+    }
+
+    printf("\nThe need : \n");
+    for(int i = 0; i < NUMBER_OF_RESOURCES; i++)
+    {
+        printf("%d ",need[customer_num][i]);
+    }
+
+    printf("\n");
+    for(int i=0; i<NUMBER_OF_RESOURCES; i++)
+    {
+        if(request[i] <= need[customer_num][i]) // if the need is more than the request, abort before checking anything else.
+        {
+            if(request[i]>available[i])
+            {
+                printf("NOT SAFE with this request (request > available) \n");
+                return false;
+            }
+            else  //taking resources//
+            {
+ 
+                if(isSafe())
+                {
+                    printf("The System is Safe \nResources Granted \n");
+
+		       for(int i=0; i<NUMBER_OF_RESOURCES; i++)
+		        {
+		            available[i] -= request[i];
+		            allocation[customer_num][i] += request[i];
+		            need[customer_num][i] -= request[i];
+		        }	
+		            return true;
+		}
+                else
+                {
+                    printf("NOT SAFE ! CAN'T GRANT RESOURCES \n");
+                    return false;
+                }
+            }
+        }
+
+        else if(request[i] > need[customer_num][i])
+        {
+            printf("The request is more than the need. Abort! \n");
+            return false;
+        }
+    }
+
+}
+
+
+
+void release_resources_highlevel(int customer_num){
+        pthread_mutex_lock(&lock);
+
+        for(int u=0;u<NUMBER_OF_RESOURCES;u++)
+        release_resources(maximum[customer_num],customer_num);
+        pthread_mutex_unlock(&lock);
+	printf(ANSI_COLOR_GREEN "Thread %d finished execution \n" ANSI_COLOR_RESET, customer_num);
+}
+
+bool request_resources_highlevel(int request[],int customer_num){
+    //CRITICAL SECTION //
+    bool released = false;
+    pthread_mutex_lock(&lock);
+    released=request_resources(request,customer_num);
+    pthread_mutex_unlock(&lock);
+
+    return released;
 }
 
 #endif // BANKER_H
