@@ -1,4 +1,4 @@
-# CIE302 (Operating Systems)- Project2 - BankerAlgorithm
+# CIE302 - BankerAlgorithm
 
 Implementing  Multithreaded Banker Algorithm - Programming project for chapter 7, Operating Systems Concepts textbook.
 
