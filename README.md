@@ -1,4 +1,4 @@
-# CIE302 - BankerAlgorithm
+# CIE302 - Banker's Algorithm
 
 Multithreaded program that implements the banker’s algorithm - Programming project for chapter 7, Operating Systems Concepts textbook.
 
